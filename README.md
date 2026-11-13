@@ -1,12 +1,16 @@
 
--- SHAWARMA HUB V2
+--==================================================
+-- SHAWARMA HUB V3
+-- Complete Flight GUI
 -- For your own Roblox Studio game
+--==================================================
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
+
 local flying = false
 local locked = false
 local flySpeed = 50
@@ -15,18 +19,19 @@ local connection
 local attachment
 local velocity
 local orientation
-local mobileUp = false
-local mobileDown = false
+
+--==================================================
+-- GUI
+--==================================================
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "ShawarmaHub"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- MAIN WINDOW
 local main = Instance.new("Frame")
-main.Size = UDim2.fromOffset(280, 310)
-main.Position = UDim2.new(0.5, -140, 0.5, -155)
+main.Size = UDim2.fromOffset(280, 265)
+main.Position = UDim2.new(0.5, -140, 0.5, -132)
 main.BackgroundColor3 = Color3.fromRGB(19, 19, 25)
 main.BorderSizePixel = 0
 main.Parent = gui
@@ -38,7 +43,10 @@ outline.Color = Color3.fromRGB(145, 65, 255)
 outline.Thickness = 2
 outline.Parent = main
 
+--==================================================
 -- HEADER
+--==================================================
+
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 48)
 header.BackgroundColor3 = Color3.fromRGB(35, 25, 50)
@@ -75,7 +83,6 @@ local function makeButton(parent, name, text, size, position, color)
     return b
 end
 
--- HEADER CONTROLS
 local lockButton = makeButton(
     header, "Lock", "🔓",
     UDim2.fromOffset(35, 30),
@@ -90,7 +97,10 @@ local closeButton = makeButton(
     Color3.fromRGB(180, 55, 65)
 )
 
+--==================================================
 -- FLIGHT BUTTONS
+--==================================================
+
 local activate = makeButton(
     main, "Activate", "✈ ACTIVATE FLY",
     UDim2.new(0.86, 0, 0, 40),
@@ -104,9 +114,13 @@ local stop = makeButton(
     UDim2.new(0.07, 0, 0, 65),
     Color3.fromRGB(190, 55, 65)
 )
+
 stop.Visible = false
 
--- SPEED
+--==================================================
+-- SPEED SETTINGS
+--==================================================
+
 local speedLabel = Instance.new("TextLabel")
 speedLabel.Size = UDim2.new(0.86, 0, 0, 25)
 speedLabel.Position = UDim2.new(0.07, 0, 0, 120)
@@ -127,6 +141,7 @@ speedBox.Font = Enum.Font.Gotham
 speedBox.TextSize = 14
 speedBox.ClearTextOnFocus = false
 speedBox.Parent = main
+
 Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0, 8)
 
 local setSpeed = makeButton(
@@ -136,32 +151,20 @@ local setSpeed = makeButton(
     Color3.fromRGB(65, 110, 180)
 )
 
--- MOBILE FLIGHT CONTROLS
-local upButton = makeButton(
-    main, "Up", "▲ UP",
-    UDim2.new(0.40, 0, 0, 35),
-    UDim2.new(0.07, 0, 0, 245),
-    Color3.fromRGB(65, 140, 95)
-)
+--==================================================
+-- MINIMIZED BUTTON
+--==================================================
 
-local downButton = makeButton(
-    main, "Down", "▼ DOWN",
-    UDim2.new(0.40, 0, 0, 35),
-    UDim2.new(0.53, 0, 0, 245),
-    Color3.fromRGB(160, 90, 65)
-)
-
--- MINIMIZED SHAWARMA BUTTON
 local mini = makeButton(
     gui, "MiniButton", "🌯",
     UDim2.fromOffset(55, 55),
     UDim2.new(0, 20, 0.5, -27),
     Color3.fromRGB(100, 45, 170)
 )
+
 mini.TextSize = 25
 mini.Visible = false
 
--- CLOSE AND REOPEN
 closeButton.MouseButton1Click:Connect(function()
     main.Visible = false
     mini.Visible = true
@@ -172,16 +175,24 @@ mini.MouseButton1Click:Connect(function()
     mini.Visible = false
 end)
 
+--==================================================
 -- LOCK / UNLOCK
+--==================================================
+
 lockButton.MouseButton1Click:Connect(function()
     locked = not locked
+
     lockButton.Text = locked and "🔒" or "🔓"
+
     lockButton.BackgroundColor3 = locked
         and Color3.fromRGB(160, 65, 65)
         or Color3.fromRGB(75, 60, 100)
 end)
 
--- DRAGGING
+--==================================================
+-- DRAG SYSTEM
+--==================================================
+
 local dragging = false
 local dragStart
 local startPosition
@@ -218,33 +229,16 @@ end)
 UIS.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
+
         dragging = false
     end
 end)
 
--- MOBILE BUTTON HOLD
-upButton.MouseButton1Down:Connect(function()
-    mobileUp = true
-end)
-
-upButton.MouseButton1Up:Connect(function()
-    mobileUp = false
-end)
-
-downButton.MouseButton1Down:Connect(function()
-    mobileDown = true
-end)
-
-downButton.MouseButton1Up:Connect(function()
-    mobileDown = false
-end)
-
-UIS.TouchEnded:Connect(function()
-    mobileUp = false
-    mobileDown = false
-end)
-
+--==================================================
 -- FLIGHT SYSTEM
+-- NORMAL ROBLOX MOVEMENT CONTROLS
+--==================================================
+
 local function stopFlying()
     flying = false
 
@@ -268,13 +262,16 @@ local function stopFlying()
         attachment = nil
     end
 
-    mobileUp = false
-    mobileDown = false
+    local character = player.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+        humanoid.AutoRotate = true
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+    end
 
     activate.Visible = true
     stop.Visible = false
-    upButton.Visible = false
-    downButton.Visible = false
 end
 
 local function startFlying()
@@ -287,7 +284,7 @@ local function startFlying()
     if not root or not humanoid then return end
 
     flying = true
-    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
 
     attachment = Instance.new("Attachment")
     attachment.Parent = root
@@ -309,8 +306,6 @@ local function startFlying()
 
     activate.Visible = false
     stop.Visible = true
-    upButton.Visible = true
-    downButton.Visible = true
 
     connection = RunService.Heartbeat:Connect(function()
         if not flying or not root.Parent then
@@ -319,32 +314,36 @@ local function startFlying()
         end
 
         local camera = workspace.CurrentCamera
+        local moveDirection = humanoid.MoveDirection
+
+        -- Normal Roblox joystick / WASD movement
         local direction = Vector3.zero
 
-        -- Keyboard
-        if UIS:IsKeyDown(Enum.KeyCode.W) then
-            direction += camera.CFrame.LookVector
+        if moveDirection.Magnitude > 0 then
+            local forward = camera.CFrame.LookVector
+            local flatForward = Vector3.new(forward.X, 0, forward.Z)
+
+            if flatForward.Magnitude > 0 then
+                flatForward = flatForward.Unit
+
+                local forwardAmount = moveDirection:Dot(flatForward)
+
+                direction = Vector3.new(
+                    moveDirection.X,
+                    forward.Y * forwardAmount,
+                    moveDirection.Z
+                )
+            else
+                direction = moveDirection
+            end
         end
 
-        if UIS:IsKeyDown(Enum.KeyCode.S) then
-            direction -= camera.CFrame.LookVector
-        end
-
-        if UIS:IsKeyDown(Enum.KeyCode.A) then
-            direction -= camera.CFrame.RightVector
-        end
-
-        if UIS:IsKeyDown(Enum.KeyCode.D) then
-            direction += camera.CFrame.RightVector
-        end
-
-        -- Vertical controls
-        if UIS:IsKeyDown(Enum.KeyCode.Space) or mobileUp then
+        -- PC vertical controls
+        if UIS:IsKeyDown(Enum.KeyCode.Space) then
             direction += Vector3.yAxis
         end
 
-        if UIS:IsKeyDown(Enum.KeyCode.LeftControl)
-            or mobileDown then
+        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
             direction -= Vector3.yAxis
         end
 
@@ -360,13 +359,17 @@ end
 activate.MouseButton1Click:Connect(startFlying)
 stop.MouseButton1Click:Connect(stopFlying)
 
+--==================================================
 -- SET SPEED
+--==================================================
+
 setSpeed.MouseButton1Click:Connect(function()
     local value = tonumber(speedBox.Text)
 
     if value then
         flySpeed = math.clamp(value, 1, 200)
         speedBox.Text = tostring(flySpeed)
+
         setSpeed.Text = "SPEED SET!"
 
         task.delay(1, function()
@@ -374,18 +377,17 @@ setSpeed.MouseButton1Click:Connect(function()
                 setSpeed.Text = "SET SPEED"
             end
         end)
+    else
+        speedBox.Text = tostring(flySpeed)
     end
 end)
 
+--==================================================
 -- RESPAWN
-player.CharacterAdded:Connect(function(character)
+--==================================================
+
+player.CharacterAdded:Connect(function()
     stopFlying()
-    local humanoid = character:WaitForChild("Humanoid")
-    humanoid.PlatformStand = false
 end)
 
--- INITIAL STATE
-upButton.Visible = false
-downButton.Visible = false
-
-print("SHAWARMA HUB V2 LOADED")
+print("SHAWARMA HUB V3 LOADED")
