@@ -1,7 +1,7 @@
 
 --========================================================
--- SHAWARMA HUB | SHAWARMA  HUB
--- LocalScript: StarterPlayer > StarterPlayerScripts
+-- SHAWARMA HUB FLIGHT V7
+-- StarterPlayer > StarterPlayerScripts > LocalScript
 --========================================================
 
 local Players = game:GetService("Players")
@@ -11,16 +11,15 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local previous = playerGui:FindFirstChild("ShawarmaHub")
-if previous then previous:Destroy() end
+local old = playerGui:FindFirstChild("ShawarmaHubFlight")
+if old then old:Destroy() end
 
 local flying = false
 local locked = false
 local speed = 65
 
 local character, humanoid, root
-local attachment, linearVelocity
-local flightConnection
+local attachment, linearVelocity, flightConnection
 
 local function getCharacter(char)
     character = char or player.Character or player.CharacterAdded:Wait()
@@ -30,15 +29,14 @@ end
 
 getCharacter()
 
--- PALETTE
-local DARK = Color3.fromRGB(24, 17, 14)
-local PANEL = Color3.fromRGB(39, 27, 21)
-local BROWN = Color3.fromRGB(83, 49, 30)
+-- LUXURY SHAWARMA COLOURS
+local DARK = Color3.fromRGB(25, 17, 14)
+local BROWN = Color3.fromRGB(75, 43, 27)
 local GOLD = Color3.fromRGB(218, 166, 91)
 local CREAM = Color3.fromRGB(255, 231, 194)
 local MUTED = Color3.fromRGB(178, 145, 112)
 local GREEN = Color3.fromRGB(111, 190, 124)
-local RED = Color3.fromRGB(191, 83, 65)
+local RED = Color3.fromRGB(177, 69, 55)
 
 local function make(class, properties, parent)
     local obj = Instance.new(class)
@@ -51,7 +49,7 @@ end
 
 -- GUI
 local gui = make("ScreenGui", {
-    Name = "ShawarmaHub",
+    Name = "ShawarmaHubFlight",
     ResetOnSpawn = false,
     ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 }, playerGui)
@@ -65,15 +63,11 @@ local main = make("Frame", {
 }, gui)
 
 make("UICorner", {CornerRadius = UDim.new(0, 18)}, main)
-make("UIStroke", {
-    Color = GOLD,
-    Thickness = 1.6,
-    Transparency = 0.08
-}, main)
+make("UIStroke", {Color = GOLD, Thickness = 1.7}, main)
 
 make("UIGradient", {
     Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(48, 32, 23)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(53, 35, 25)),
         ColorSequenceKeypoint.new(1, DARK)
     }),
     Rotation = 35
@@ -88,57 +82,50 @@ local header = make("Frame", {
 
 make("UICorner", {CornerRadius = UDim.new(0, 18)}, header)
 
-local headerBottom = make("Frame", {
-    Size = UDim2.new(1, 0, 0, 16),
-    Position = UDim2.new(0, 0, 1, -16),
-    BackgroundColor3 = BROWN,
-    BorderSizePixel = 0
-}, header)
-
 make("TextLabel", {
     Size = UDim2.new(1, -110, 0, 31),
-    Position = UDim2.fromOffset(17, 8),
+    Position = UDim2.fromOffset(16, 8),
     BackgroundTransparency = 1,
-    Text = "SHAWARMA",
+    Text = "SHAWARMA HUB",
     TextColor3 = CREAM,
     Font = Enum.Font.GothamBlack,
-    TextSize = 20,
+    TextSize = 19,
     TextXAlignment = Enum.TextXAlignment.Left
 }, header)
 
 make("TextLabel", {
-    Size = UDim2.new(1, -110, 0, 17),
-    Position = UDim2.fromOffset(18, 38),
+    Size = UDim2.new(1, -110, 0, 18),
+    Position = UDim2.fromOffset(17, 39),
     BackgroundTransparency = 1,
-    Text = "✦  PREMIUM FLIGHT CLUB",
+    Text = "✦  FLIGHT EXPERIENCE",
     TextColor3 = GOLD,
     Font = Enum.Font.GothamMedium,
     TextSize = 10,
     TextXAlignment = Enum.TextXAlignment.Left
 }, header)
 
-local function headerButton(text, position, color)
+local function headerButton(text, x, color)
     local b = make("TextButton", {
         Size = UDim2.fromOffset(34, 32),
-        Position = position,
+        Position = UDim2.new(1, x, 0, 18),
         BackgroundColor3 = color,
         Text = text,
         TextColor3 = CREAM,
         Font = Enum.Font.GothamBold,
-        TextSize = 15,
-        AutoButtonColor = true
+        TextSize = 16
     }, header)
-    make("UICorner", {CornerRadius = UDim.new(0, 9)}, b)
-    make("UIStroke", {Color = GOLD, Transparency = 0.65}, b)
+
+    make("UICorner", {CornerRadius = UDim.new(0, 8)}, b)
+    make("UIStroke", {Color = GOLD, Transparency = 0.6}, b)
     return b
 end
 
-local lockButton = headerButton("🔓", UDim2.new(1, -82, 0, 18), PANEL)
-local closeButton = headerButton("×", UDim2.new(1, -42, 0, 18), RED)
+local lockButton = headerButton("🔓", -82, DARK)
+local closeButton = headerButton("×", -42, RED)
 
 -- STATUS
 make("TextLabel", {
-    Size = UDim2.new(1, -34, 0, 20),
+    Size = UDim2.new(1, -34, 0, 18),
     Position = UDim2.fromOffset(17, 82),
     BackgroundTransparency = 1,
     Text = "FLIGHT STATUS",
@@ -159,45 +146,44 @@ local status = make("TextLabel", {
     TextXAlignment = Enum.TextXAlignment.Left
 }, main)
 
--- FLIGHT TOGGLE
+-- ONE FLIGHT BUTTON
 local toggle = make("TextButton", {
     Size = UDim2.new(1, -34, 0, 49),
     Position = UDim2.fromOffset(17, 139),
     BackgroundColor3 = GOLD,
-    Text = "✈     ACTIVATE FLIGHT",
+    Text = "✈   ACTIVATE FLIGHT",
     TextColor3 = DARK,
     Font = Enum.Font.GothamBlack,
-    TextSize = 15,
-    AutoButtonColor = true
+    TextSize = 15
 }, main)
 
 make("UICorner", {CornerRadius = UDim.new(0, 11)}, toggle)
 
--- SPEED
+-- SPEED BUTTON
 local speedButton = make("TextButton", {
     Size = UDim2.new(1, -34, 0, 38),
     Position = UDim2.fromOffset(17, 198),
-    BackgroundColor3 = PANEL,
-    Text = "FLIGHT SPEED     •     " .. speed,
+    BackgroundColor3 = BROWN,
+    Text = "FLIGHT SPEED  •  " .. speed,
     TextColor3 = CREAM,
     Font = Enum.Font.GothamBold,
     TextSize = 12
 }, main)
 
 make("UICorner", {CornerRadius = UDim.new(0, 9)}, speedButton)
-make("UIStroke", {Color = GOLD, Transparency = 0.7}, speedButton)
+make("UIStroke", {Color = GOLD, Transparency = 0.65}, speedButton)
 
 make("TextLabel", {
     Size = UDim2.new(1, 0, 0, 18),
     Position = UDim2.fromOffset(0, 245),
     BackgroundTransparency = 1,
-    Text = "SHAWARMA HUB  •  EST. 2026",
+    Text = "✦  SHAWARMA HUB FLIGHT  ✦",
     TextColor3 = MUTED,
     Font = Enum.Font.GothamMedium,
     TextSize = 9
 }, main)
 
--- MINIMISED BUTTON
+-- MINIMISED ICON
 local reopen = make("TextButton", {
     Size = UDim2.fromOffset(62, 62),
     Position = UDim2.new(0, 18, 0.5, -31),
@@ -285,7 +271,7 @@ local function stopFlight()
         humanoid.AutoRotate = true
     end
 
-    toggle.Text = "✈     ACTIVATE FLIGHT"
+    toggle.Text = "✈   ACTIVATE FLIGHT"
     toggle.BackgroundColor3 = GOLD
     toggle.TextColor3 = DARK
     status.Text = "●  FLIGHT OFF"
@@ -301,9 +287,8 @@ local function startFlight()
     end
 
     flying = true
+    humanoid.AutoRotate = false
 
-    -- Attachment and LinearVelocity only.
-    -- No BodyGyro, AlignOrientation or CFrame rotation.
     attachment = Instance.new("Attachment")
     attachment.Name = "ShawarmaFlightAttachment"
     attachment.Parent = root
@@ -317,9 +302,7 @@ local function startFlight()
     linearVelocity.VectorVelocity = Vector3.zero
     linearVelocity.Parent = root
 
-    humanoid.AutoRotate = false
-
-    toggle.Text = "■     STOP FLIGHT"
+    toggle.Text = "■   STOP FLYING"
     toggle.BackgroundColor3 = RED
     toggle.TextColor3 = CREAM
     status.Text = "●  FLIGHT ACTIVE"
@@ -332,19 +315,24 @@ local function startFlight()
             return
         end
 
+        local camera = workspace.CurrentCamera
         local move = humanoid.MoveDirection
-        local vertical = 0
 
-        if UIS:IsKeyDown(Enum.KeyCode.Space) or humanoid.Jump then
-            vertical += 1
+        -- Camera pitch adds vertical movement when moving forward/back.
+        local cameraForward = camera.CFrame.LookVector
+        local flatForward = Vector3.new(
+            cameraForward.X, 0, cameraForward.Z
+        )
+
+        if flatForward.Magnitude > 0.001 then
+            flatForward = flatForward.Unit
         end
 
-        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
-            vertical -= 1
-        end
+        local forwardAmount = move:Dot(flatForward)
+        local vertical = cameraForward.Y * forwardAmount
 
-        -- Joystick movement stays horizontal.
-        -- Camera pitch does not rotate the character.
+        -- No jump button required.
+        -- Joystick/WASD + camera tilt controls all flight.
         local direction = Vector3.new(move.X, vertical, move.Z)
 
         if direction.Magnitude > 1 then
@@ -368,7 +356,7 @@ speedButton.MouseButton1Click:Connect(function()
     if speed > 125 then
         speed = 35
     end
-    speedButton.Text = "FLIGHT SPEED     •     " .. speed
+    speedButton.Text = "FLIGHT SPEED  •  " .. speed
 end)
 
 player.CharacterAdded:Connect(function(newCharacter)
@@ -378,4 +366,4 @@ player.CharacterAdded:Connect(function(newCharacter)
     root = newCharacter:WaitForChild("HumanoidRootPart")
 end)
 
-print("SHAWARMA HUB PREMIUM LOADED")
+print("SHAWARMA HUB FLIGHT V7 loaded")
