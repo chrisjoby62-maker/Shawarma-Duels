@@ -1,9 +1,7 @@
 
---==================================================
--- SHAWARMA HUB V3
--- Complete Flight GUI
--- For your own Roblox Studio game
---==================================================
+--====================================================
+--             🌯 SHAWARMA HUB V4
+--====================================================
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -20,9 +18,9 @@ local attachment
 local velocity
 local orientation
 
---==================================================
--- GUI
---==================================================
+--====================================================
+-- GUI CREATION
+--====================================================
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "ShawarmaHub"
@@ -30,139 +28,208 @@ gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local main = Instance.new("Frame")
-main.Size = UDim2.fromOffset(280, 265)
-main.Position = UDim2.new(0.5, -140, 0.5, -132)
-main.BackgroundColor3 = Color3.fromRGB(19, 19, 25)
+main.Name = "Main"
+main.Size = UDim2.fromOffset(300, 310)
+main.Position = UDim2.new(0.5, -150, 0.5, -155)
+main.BackgroundColor3 = Color3.fromRGB(19, 16, 22)
 main.BorderSizePixel = 0
+main.ClipsDescendants = true
 main.Parent = gui
 
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 14)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 16)
 
 local outline = Instance.new("UIStroke")
-outline.Color = Color3.fromRGB(145, 65, 255)
+outline.Color = Color3.fromRGB(145, 75, 220)
 outline.Thickness = 2
 outline.Parent = main
 
---==================================================
--- HEADER
---==================================================
+--====================================================
+-- SHAWARMA BACKGROUND
+--====================================================
 
-local header = Instance.new("Frame")
-header.Size = UDim2.new(1, 0, 0, 48)
-header.BackgroundColor3 = Color3.fromRGB(35, 25, 50)
-header.BorderSizePixel = 0
-header.Parent = main
+local background = Instance.new("ImageLabel")
+background.Name = "ShawarmaBackground"
+background.Size = UDim2.fromScale(1, 1)
+background.Position = UDim2.fromScale(0, 0)
+background.BackgroundTransparency = 1
 
-Instance.new("UICorner", header).CornerRadius = UDim.new(0, 12)
+-- Upload your shawarma background image to Roblox
+-- and replace the placeholder below with its asset ID.
+background.Image = "rbxassetid://YOUR_IMAGE_ID"
+background.ImageTransparency = 0.55
+background.ScaleType = Enum.ScaleType.Crop
+background.ZIndex = 1
+background.Parent = main
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(0.55, 0, 1, 0)
-title.Position = UDim2.fromOffset(12, 0)
-title.BackgroundTransparency = 1
-title.Text = "🌯 SHAWARMA HUB"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 17
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = header
+local overlay = Instance.new("Frame")
+overlay.Size = UDim2.fromScale(1, 1)
+overlay.BackgroundColor3 = Color3.fromRGB(15, 10, 20)
+overlay.BackgroundTransparency = 0.20
+overlay.BorderSizePixel = 0
+overlay.ZIndex = 2
+overlay.Parent = main
 
-local function makeButton(parent, name, text, size, position, color)
-    local b = Instance.new("TextButton")
-    b.Name = name
-    b.Size = size
-    b.Position = position
-    b.BackgroundColor3 = color
-    b.Text = text
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.Font = Enum.Font.GothamBold
-    b.TextSize = 14
-    b.BorderSizePixel = 0
-    b.Parent = parent
+--====================================================
+-- BUTTON CREATOR
+--====================================================
 
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
-    return b
+local function createButton(parent, name, text, size, pos, color)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Size = size
+    button.Position = pos
+    button.BackgroundColor3 = color
+    button.Text = text
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.TextSize = 14
+    button.Font = Enum.Font.GothamBold
+    button.BorderSizePixel = 0
+    button.AutoButtonColor = true
+    button.ZIndex = 5
+    button.Parent = parent
+
+    Instance.new("UICorner", button).CornerRadius =
+        UDim.new(0, 9)
+
+    return button
 end
 
-local lockButton = makeButton(
+--====================================================
+-- HEADER
+--====================================================
+
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 55)
+header.BackgroundColor3 = Color3.fromRGB(35, 23, 43)
+header.BackgroundTransparency = 0.05
+header.BorderSizePixel = 0
+header.ZIndex = 4
+header.Parent = main
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0.58, 0, 1, 0)
+title.Position = UDim2.fromOffset(13, 0)
+title.BackgroundTransparency = 1
+title.Text = "🌯 SHAWARMA HUB"
+title.TextColor3 = Color3.fromRGB(255, 235, 215)
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 17
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 5
+title.Parent = header
+
+local lockButton = createButton(
     header, "Lock", "🔓",
-    UDim2.fromOffset(35, 30),
-    UDim2.new(1, -82, 0, 9),
-    Color3.fromRGB(75, 60, 100)
+    UDim2.fromOffset(34, 30),
+    UDim2.new(1, -80, 0, 12),
+    Color3.fromRGB(90, 60, 110)
 )
 
-local closeButton = makeButton(
-    header, "Close", "X",
-    UDim2.fromOffset(35, 30),
-    UDim2.new(1, -42, 0, 9),
-    Color3.fromRGB(180, 55, 65)
+local closeButton = createButton(
+    header, "Close", "✕",
+    UDim2.fromOffset(34, 30),
+    UDim2.new(1, -39, 0, 12),
+    Color3.fromRGB(170, 55, 65)
 )
 
---==================================================
--- FLIGHT BUTTONS
---==================================================
+--====================================================
+-- STATUS
+--====================================================
 
-local activate = makeButton(
-    main, "Activate", "✈ ACTIVATE FLY",
-    UDim2.new(0.86, 0, 0, 40),
-    UDim2.new(0.07, 0, 0, 65),
-    Color3.fromRGB(120, 55, 220)
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -30, 0, 25)
+status.Position = UDim2.fromOffset(15, 62)
+status.BackgroundTransparency = 1
+status.Text = "● FLIGHT SYSTEM READY"
+status.TextColor3 = Color3.fromRGB(150, 220, 160)
+status.Font = Enum.Font.GothamBold
+status.TextSize = 12
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.ZIndex = 5
+status.Parent = main
+
+--====================================================
+-- ACTIVATE / STOP
+--====================================================
+
+local activate = createButton(
+    main, "ActivateFly", "✈  ACTIVATE FLY",
+    UDim2.new(1, -36, 0, 43),
+    UDim2.fromOffset(18, 100),
+    Color3.fromRGB(115, 55, 190)
 )
 
-local stop = makeButton(
-    main, "Stop", "■ STOP FLY",
-    UDim2.new(0.86, 0, 0, 40),
-    UDim2.new(0.07, 0, 0, 65),
-    Color3.fromRGB(190, 55, 65)
+local stop = createButton(
+    main, "StopFly", "■  STOP FLY",
+    UDim2.new(1, -36, 0, 43),
+    UDim2.fromOffset(18, 100),
+    Color3.fromRGB(185, 55, 65)
 )
 
 stop.Visible = false
 
---==================================================
+--====================================================
 -- SPEED SETTINGS
---==================================================
+--====================================================
 
 local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(0.86, 0, 0, 25)
-speedLabel.Position = UDim2.new(0.07, 0, 0, 120)
+speedLabel.Size = UDim2.new(1, -36, 0, 25)
+speedLabel.Position = UDim2.fromOffset(18, 157)
 speedLabel.BackgroundTransparency = 1
 speedLabel.Text = "FLIGHT SPEED"
-speedLabel.TextColor3 = Color3.fromRGB(200, 190, 220)
+speedLabel.TextColor3 = Color3.fromRGB(230, 205, 240)
 speedLabel.Font = Enum.Font.GothamBold
-speedLabel.TextSize = 13
+speedLabel.TextSize = 12
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+speedLabel.ZIndex = 5
 speedLabel.Parent = main
 
 local speedBox = Instance.new("TextBox")
-speedBox.Size = UDim2.new(0.86, 0, 0, 35)
-speedBox.Position = UDim2.new(0.07, 0, 0, 150)
-speedBox.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+speedBox.Size = UDim2.new(1, -36, 0, 38)
+speedBox.Position = UDim2.fromOffset(18, 184)
+speedBox.BackgroundColor3 = Color3.fromRGB(35, 30, 42)
 speedBox.Text = "50"
+speedBox.PlaceholderText = "Enter speed"
 speedBox.TextColor3 = Color3.new(1, 1, 1)
-speedBox.Font = Enum.Font.Gotham
-speedBox.TextSize = 14
+speedBox.Font = Enum.Font.GothamBold
+speedBox.TextSize = 15
 speedBox.ClearTextOnFocus = false
+speedBox.ZIndex = 5
 speedBox.Parent = main
 
-Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", speedBox).CornerRadius =
+    UDim.new(0, 8)
 
-local setSpeed = makeButton(
-    main, "SetSpeed", "SET SPEED",
-    UDim2.new(0.86, 0, 0, 35),
-    UDim2.new(0.07, 0, 0, 195),
-    Color3.fromRGB(65, 110, 180)
+local setSpeed = createButton(
+    main, "SetSpeed", "UPDATE SPEED",
+    UDim2.new(1, -36, 0, 36),
+    UDim2.fromOffset(18, 231),
+    Color3.fromRGB(85, 65, 145)
 )
 
---==================================================
+local footer = Instance.new("TextLabel")
+footer.Size = UDim2.new(1, -30, 0, 20)
+footer.Position = UDim2.fromOffset(15, 278)
+footer.BackgroundTransparency = 1
+footer.Text = "SHAWARMA HUB  •  V4"
+footer.TextColor3 = Color3.fromRGB(190, 155, 205)
+footer.Font = Enum.Font.GothamBold
+footer.TextSize = 10
+footer.ZIndex = 5
+footer.Parent = main
+
+--====================================================
 -- MINIMIZED BUTTON
---==================================================
+--====================================================
 
-local mini = makeButton(
+local mini = createButton(
     gui, "MiniButton", "🌯",
-    UDim2.fromOffset(55, 55),
-    UDim2.new(0, 20, 0.5, -27),
-    Color3.fromRGB(100, 45, 170)
+    UDim2.fromOffset(58, 58),
+    UDim2.new(0, 20, 0.5, -29),
+    Color3.fromRGB(100, 45, 155)
 )
 
-mini.TextSize = 25
+mini.TextSize = 26
 mini.Visible = false
 
 closeButton.MouseButton1Click:Connect(function()
@@ -175,9 +242,9 @@ mini.MouseButton1Click:Connect(function()
     mini.Visible = false
 end)
 
---==================================================
--- LOCK / UNLOCK
---==================================================
+--====================================================
+-- LOCK SYSTEM
+--====================================================
 
 lockButton.MouseButton1Click:Connect(function()
     locked = not locked
@@ -185,13 +252,13 @@ lockButton.MouseButton1Click:Connect(function()
     lockButton.Text = locked and "🔒" or "🔓"
 
     lockButton.BackgroundColor3 = locked
-        and Color3.fromRGB(160, 65, 65)
-        or Color3.fromRGB(75, 60, 100)
+        and Color3.fromRGB(170, 65, 65)
+        or Color3.fromRGB(90, 60, 110)
 end)
 
---==================================================
+--====================================================
 -- DRAG SYSTEM
---==================================================
+--====================================================
 
 local dragging = false
 local dragStart
@@ -234,10 +301,9 @@ UIS.InputEnded:Connect(function(input)
     end
 end)
 
---==================================================
--- FLIGHT SYSTEM
--- NORMAL ROBLOX MOVEMENT CONTROLS
---==================================================
+--====================================================
+-- FLIGHT SYSTEM - NO SPINNING
+--====================================================
 
 local function stopFlying()
     flying = false
@@ -263,23 +329,32 @@ local function stopFlying()
     end
 
     local character = player.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    local humanoid = character and
+        character:FindFirstChildOfClass("Humanoid")
 
     if humanoid then
         humanoid.AutoRotate = true
-        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+        humanoid:ChangeState(
+            Enum.HumanoidStateType.GettingUp
+        )
     end
 
     activate.Visible = true
     stop.Visible = false
+
+    status.Text = "● FLIGHT SYSTEM READY"
+    status.TextColor3 = Color3.fromRGB(150, 220, 160)
 end
 
 local function startFlying()
     if flying then return end
 
     local character = player.Character
-    local root = character and character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    local root = character and
+        character:FindFirstChild("HumanoidRootPart")
+
+    local humanoid = character and
+        character:FindFirstChildOfClass("Humanoid")
 
     if not root or not humanoid then return end
 
@@ -292,20 +367,25 @@ local function startFlying()
     velocity = Instance.new("LinearVelocity")
     velocity.Attachment0 = attachment
     velocity.RelativeTo = Enum.ActuatorRelativeTo.World
-    velocity.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+    velocity.VelocityConstraintMode =
+        Enum.VelocityConstraintMode.Vector
     velocity.MaxForce = 1000000
     velocity.VectorVelocity = Vector3.zero
     velocity.Parent = root
 
     orientation = Instance.new("AlignOrientation")
     orientation.Attachment0 = attachment
-    orientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    orientation.Mode =
+        Enum.OrientationAlignmentMode.OneAttachment
     orientation.MaxTorque = 1000000
-    orientation.Responsiveness = 20
+    orientation.Responsiveness = 15
     orientation.Parent = root
 
     activate.Visible = false
     stop.Visible = true
+
+    status.Text = "● FLIGHT ACTIVE"
+    status.TextColor3 = Color3.fromRGB(160, 240, 170)
 
     connection = RunService.Heartbeat:Connect(function()
         if not flying or not root.Parent then
@@ -316,29 +396,22 @@ local function startFlying()
         local camera = workspace.CurrentCamera
         local moveDirection = humanoid.MoveDirection
 
-        -- Normal Roblox joystick / WASD movement
+        -- Normal Roblox joystick and WASD movement
         local direction = Vector3.zero
 
-        if moveDirection.Magnitude > 0 then
-            local forward = camera.CFrame.LookVector
-            local flatForward = Vector3.new(forward.X, 0, forward.Z)
+        if moveDirection.Magnitude > 0.05 then
+            direction = moveDirection
 
-            if flatForward.Magnitude > 0 then
-                flatForward = flatForward.Unit
-
-                local forwardAmount = moveDirection:Dot(flatForward)
-
-                direction = Vector3.new(
-                    moveDirection.X,
-                    forward.Y * forwardAmount,
-                    moveDirection.Z
-                )
-            else
-                direction = moveDirection
-            end
+            -- Preserve horizontal movement without
+            -- following camera pitch or camera roll.
+            direction = Vector3.new(
+                direction.X,
+                0,
+                direction.Z
+            )
         end
 
-        -- PC vertical controls
+        -- PC vertical movement
         if UIS:IsKeyDown(Enum.KeyCode.Space) then
             direction += Vector3.yAxis
         end
@@ -352,16 +425,30 @@ local function startFlying()
         end
 
         velocity.VectorVelocity = direction * flySpeed
-        orientation.CFrame = camera.CFrame
+
+        -- Face movement direction, never camera rotation.
+        -- This prevents camera-induced spinning.
+        local horizontal = Vector3.new(
+            moveDirection.X,
+            0,
+            moveDirection.Z
+        )
+
+        if horizontal.Magnitude > 0.05 then
+            orientation.CFrame = CFrame.lookAt(
+                root.Position,
+                root.Position + horizontal.Unit
+            )
+        end
     end)
 end
 
 activate.MouseButton1Click:Connect(startFlying)
 stop.MouseButton1Click:Connect(stopFlying)
 
---==================================================
--- SET SPEED
---==================================================
+--====================================================
+-- SPEED UPDATE
+--====================================================
 
 setSpeed.MouseButton1Click:Connect(function()
     local value = tonumber(speedBox.Text)
@@ -369,12 +456,11 @@ setSpeed.MouseButton1Click:Connect(function()
     if value then
         flySpeed = math.clamp(value, 1, 200)
         speedBox.Text = tostring(flySpeed)
-
-        setSpeed.Text = "SPEED SET!"
+        setSpeed.Text = "SPEED UPDATED!"
 
         task.delay(1, function()
             if setSpeed.Parent then
-                setSpeed.Text = "SET SPEED"
+                setSpeed.Text = "UPDATE SPEED"
             end
         end)
     else
@@ -382,12 +468,12 @@ setSpeed.MouseButton1Click:Connect(function()
     end
 end)
 
---==================================================
--- RESPAWN
---==================================================
+--====================================================
+-- RESPAWN CLEANUP
+--====================================================
 
 player.CharacterAdded:Connect(function()
     stopFlying()
 end)
 
-print("SHAWARMA HUB V3 LOADED")
+print("🌯 SHAWARMA HUB V4 LOADED")
